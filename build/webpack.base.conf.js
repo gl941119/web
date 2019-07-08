@@ -1,6 +1,7 @@
 'use strict'
 const path = require('path')
 const utils = require('./utils')
+var webpack = require('webpack')
 const config = require('../config')
 const vueLoaderConfig = require('./vue-loader.conf')
 
@@ -36,11 +37,26 @@ module.exports = {
     alias: {
       'vue$': 'vue/dist/vue.esm.js',
       '@': resolve('src'),
+      '@assets': resolve('src/assets'),
     }
   },
+  plugins: [
+    //jq
+    new webpack.optimize.CommonsChunkPlugin('common.js'),
+    new webpack.ProvidePlugin({
+      jQuery: "jquery",
+      $: "jquery"
+    })
+  ],
   module: {
     rules: [
-      ...(config.dev.useEslint ? [createLintingRule()] : []),
+      // Eslint
+      // ...(config.dev.useEslint ? [createLintingRule()] : []),
+      //less
+      {
+        test: /\.less$/,
+        loader: "style-loader!css-loader!less-loader"
+      },
       {
         test: /\.vue$/,
         loader: 'vue-loader',
