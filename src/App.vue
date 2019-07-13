@@ -12,6 +12,7 @@ export default {
 
 <style>
   @import "assets/base.css";
+  @import "assets/common.css";
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -20,4 +21,5 @@ export default {
   color: #2c3e50;
   height: 100%;
 }
+
 </style>

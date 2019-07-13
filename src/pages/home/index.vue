@@ -1,8 +1,13 @@
 <template>
   <div class="home">
-    <div class="video" ref="video">
-      <img class="img" ref="img" :src="imgSrc" @load="loadImage" alt="">
-      <!--<div class="wrapper" :style="{'marginTop': marginTop}"></div>-->
+    <div class="video" ref="video" :style="{marginBottom:scrollLen+'px'}">
+      <img class="img" ref="img"  :src="imgSrc" @load="loadImage" alt="">
+      <transition name="fade">
+      <img v-if="isShowScroll" class="scroll" src="../../assets/image/scroll.png" width="208" height="134" alt="">
+      </transition>
+      <transition name="fade">
+      <img v-if="isShowName" class="name" src="../../assets/image/logo-name.png"  alt="">
+      </transition>
     </div>
   </div>
 </template>
@@ -15,23 +20,39 @@ export default {
     return {
       imgSrc: `./static/video/video_0000.jpg`, // 首屏图片
       url: './static/video', // 图片路径
-      marginTop: '500px', // 滚动条总距离
-      photoTotal: 190, // 图片总数
+      scrollLen: 1000, // 滚动条距离
+      photoTotal: 150, // 图片总数
       photoNum: 1, // 图片数缓存
       infoList: [], // 渲染队列
-      flag: true// 是否需要渲染
+      flag: true, // 是否需要渲染
+      isShowScroll: true, // 下滑图片过度
+      isShowName: false // logo过度
     }
   },
   methods: {
     handleScroll (e) {
-      this.addList()
+      let scrollTop = document.documentElement.scrollTop
+      this.handleShow(scrollTop)
+      this.addList(scrollTop)
       if (this.flag) { this.loadImage() }
     },
+    // logo显示
+    handleShow (scrollTop) {
+      if (scrollTop <= (this.scrollLen / 10)) {
+        this.isShowScroll = true
+      } else {
+        this.isShowScroll = false
+      }
+      if (scrollTop <= (this.scrollLen / 2)) {
+        this.isShowName = false
+      } else {
+        this.isShowName = true
+      }
+    },
     // 队列缓存
-    addList () {
-      let scrollTop = document.documentElement.scrollTop
+    addList (scrollTop) {
       // 图片数
-      let num = Math.floor(scrollTop / (parseInt(this.marginTop.split('px')[0]) / this.photoTotal))
+      let num = Math.floor(scrollTop / (this.scrollLen / this.photoTotal))
       // 防止重复
       if (num !== this.photoNum) {
         this.photoNum = num
@@ -48,12 +69,10 @@ export default {
         this.flag = false
       }
     },
-
     // 地址填充
     calcUrl (num) {
       return `${this.url}/video_${PrefixInteger(num, 0, 4)}.jpg`
     },
-
     // 预加载
     handlePrestrain () {
       let images = new Array(this.photoTotal).fill()
@@ -81,23 +100,16 @@ export default {
   },
   mounted () {
     this.handlePrestrain()
-    // this.marginTop = this.$refs['video'].clientHeight * 3 + 'px'
+    this.scrollLen = this.$refs['video'].clientHeight * 4
     document.documentElement.scrollTop = 0
-    // this.handleScroll()
-  },
-  updated () {
-    // console.log(123)
   }
-
 }
 </script>
 
 <style lang="less" scoped>
   .video{
     height: 100%;
-    margin-bottom: 500px;
-    /*overflow: hidden;*/
-    >img{
+    .img{
       display: block;
      width: 100%;
       height: 100%;
@@ -106,12 +118,21 @@ export default {
       z-index: 0;
       top: 0px;
     }
+    .scroll{
+      position: fixed;
+      bottom: 50px;
+      left: 50%;
+      margin-left: -104px;
+      z-index: 999;
+    }
+    .name{
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      z-index: 800;
+      margin-left: -428px;
+      margin-top: -242px;
+    }
   }
-  .wrapper{
-    height: 1px;
-    background: #d2b8b800;
-    z-index: 900;
-    position: relative;
-    padding-top: 0;
-  }
+
 </style>
