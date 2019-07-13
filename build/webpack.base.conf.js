@@ -40,14 +40,14 @@ module.exports = {
       '@assets': resolve('src/assets'),
     }
   },
-  // plugins: [
-  //   //jq
-  //   new webpack.optimize.CommonsChunkPlugin('common.js'),
-  //   new webpack.ProvidePlugin({
-  //     jQuery: "jquery",
-  //     $: "jquery"
-  //   })
-  // ],
+  plugins: [
+    //jq
+    new webpack.optimize.CommonsChunkPlugin('common.js'),
+    new webpack.ProvidePlugin({
+      jQuery: "jquery",
+      $: "jquery"
+    })
+  ],
   module: {
     rules: [
       // Eslint
