@@ -38,6 +38,7 @@ module.exports = {
       'vue$': 'vue/dist/vue.esm.js',
       '@': resolve('src'),
       '@assets': resolve('src/assets'),
+      '@tools': resolve('src/tools')
     }
   },
   plugins: [
@@ -51,7 +52,7 @@ module.exports = {
   module: {
     rules: [
       // Eslint
-      // ...(config.dev.useEslint ? [createLintingRule()] : []),
+      ...(config.dev.useEslint ? [createLintingRule()] : []),
       //less
       {
         test: /\.less$/,

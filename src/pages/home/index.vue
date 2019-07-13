@@ -1,92 +1,92 @@
 <template>
-  <div class="home" id="main">
+  <div class="home">
     <div class="video" ref="video">
       <img class="img" ref="img" :src="imgSrc" @load="loadImage" alt="">
-      <div class="wrapper" :style="{'marginTop': marginTop}"></div>
+      <!--<div class="wrapper" :style="{'marginTop': marginTop}"></div>-->
     </div>
   </div>
 </template>
 
 <script>
+import {PrefixInteger, throttle} from '@tools/utils'
 export default {
   name: 'index',
   data () {
     return {
-      imgSrc: `./static/video/video_0001.jpg`,
-      url: './static/video',
+      imgSrc: `./static/video/video_0000.jpg`, // 首屏图片
+      url: './static/video', // 图片路径
       marginTop: '500px', // 滚动条总距离
+      photoTotal: 190, // 图片总数
       photoNum: 1, // 图片数缓存
       infoList: [], // 渲染队列
-      flag: true// 开关
+      flag: true// 是否需要渲染
     }
   },
   methods: {
+    handleScroll (e) {
+      this.addList()
+      if (this.flag) { this.loadImage() }
+    },
+    // 队列缓存
+    addList () {
+      let scrollTop = document.documentElement.scrollTop
+      // 图片数
+      let num = Math.floor(scrollTop / (parseInt(this.marginTop.split('px')[0]) / this.photoTotal))
+      // 防止重复
+      if (num !== this.photoNum) {
+        this.photoNum = num
+        this.infoList.push(num)
+        this.flag = true
+      }
+    },
     // 图片渲染
     loadImage (e) {
       if (this.infoList.length) {
-        // let video = this.$refs['img']
-        this.imgSrc = this.infoList[0]
+        this.imgSrc = this.calcUrl(this.infoList[0])
         this.infoList.shift()
-        this.flag = true
       } else {
         this.flag = false
       }
     },
-    // 队列添加
-    addList () {
-      let scrollTop = document.documentElement.scrollTop
-      let num
-      // 图片数
-      num = Math.floor(scrollTop / (parseInt(this.marginTop.split('px')[0]) / 190))
-      if (num !== this.photoNum) {
-        this.photoNum = num
-        this.infoList.push(this.calcUrl(num))
-      }
-    },
+
     // 地址填充
     calcUrl (num) {
-      if (num < 10) {
-        return `${this.url}/video_000${num}.jpg`
-      } else if (num < 100) {
-        return `${this.url}/video_00${num}.jpg`
-      } else {
-        return `${this.url}/video_0${num}.jpg`
-      }
+      return `${this.url}/video_${PrefixInteger(num, 0, 4)}.jpg`
     },
-    handleScroll (e) {
-      this.addList()
-      this.flag === false ? this.loadImage() : ''
+
+    // 预加载
+    handlePrestrain () {
+      let images = new Array(this.photoTotal).fill()
+      let count = 0 // 计数器
+      images.forEach((item, index) => {
+        item = new Image()
+        item.src = this.calcUrl(index)
+        item.onerror = () => {
+          // 加载失败
+        }
+        item.onload = () => {
+          count++
+          // 加载成功
+          if (count === this.photoTotal) this.loadSuccess()
+        }
+      })
+    },
+    // 预加载完成绑定事件
+    loadSuccess () {
+      window.addEventListener('scroll', throttle(() => {
+        this.handleScroll()
+      }, 20), true)
     }
-    // 节流
-    // throttle (fun, delay, time) {
-    //   var timeout,
-    //     startTime = new Date()
-    //
-    //   return  ()=> {
-    //     var context = this,
-    //       args = arguments,
-    //       curTime = new Date()
-    //
-    //     clearTimeout(timeout)
-    //     // 如果达到了规定的触发时间间隔，触发 handler
-    //     if (curTime - startTime >= time) {
-    //       fun.apply(context, args)
-    //       startTime = curTime
-    //       // 没达到触发间隔，重新设定定时器
-    //     } else {
-    //       timeout = setTimeout(fun, delay)
-    //     }
-    //   }
-    // }
+
   },
   mounted () {
-    window.addEventListener('scroll', this.handleScroll, true)
-    this.marginTop = this.$refs['video'].clientHeight * 3 + 'px'
-    let images = new Array()
-    for (let i = 0, len = 191; i < len; i++) {
-      images[i] = new Image()
-      images[i].src = this.calcUrl(i)
-    }
+    this.handlePrestrain()
+    // this.marginTop = this.$refs['video'].clientHeight * 3 + 'px'
+    document.documentElement.scrollTop = 0
+    // this.handleScroll()
+  },
+  updated () {
+    // console.log(123)
   }
 
 }
@@ -95,6 +95,8 @@ export default {
 <style lang="less" scoped>
   .video{
     height: 100%;
+    margin-bottom: 500px;
+    /*overflow: hidden;*/
     >img{
       display: block;
      width: 100%;
