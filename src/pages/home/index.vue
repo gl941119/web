@@ -12,8 +12,8 @@ export default {
   name: 'index',
   data () {
     return {
-      imgSrc: `/static/video/video_0001.jpg`,
-      url: '/static/video',
+      imgSrc: `./static/video/video_0001.jpg`,
+      url: './static/video',
       marginTop: '500px', // 滚动条总距离
       photoNum: 1, // 图片数缓存
       infoList: [], // 渲染队列
@@ -82,7 +82,7 @@ export default {
   mounted () {
     window.addEventListener('scroll', this.handleScroll, true)
     this.marginTop = this.$refs['video'].clientHeight * 3 + 'px'
-    var images = new Array()
+    let images = new Array()
     for (let i = 0, len = 191; i < len; i++) {
       images[i] = new Image()
       images[i].src = this.calcUrl(i)
