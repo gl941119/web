@@ -3,10 +3,10 @@
     <div class="video" ref="video" :style="{marginBottom:scrollLen+'px'}">
       <img class="img" ref="img"  :src="imgSrc" @load="loadImage" alt="">
       <transition name="fade">
-      <img v-if="isShowScroll" class="scroll" src="../../assets/image/scroll.png" width="208" height="134" alt="">
+      <img v-if="isShowScroll" class="scroll" src="../../assets/image/scroll.png" width="208" height="134" alt="" onclick="return false">
       </transition>
       <transition name="fade">
-      <img v-if="isShowName" class="name" src="../../assets/image/logo-name.png"  alt="">
+      <img v-if="isShowName" class="name" src="../../assets/image/logo-name.png"  alt="" onclick="return false">
       </transition>
     </div>
   </div>
@@ -30,6 +30,7 @@ export default {
     }
   },
   methods: {
+    // 滑动事件
     handleScroll (e) {
       let scrollTop = document.documentElement.scrollTop
       this.handleShow(scrollTop)
