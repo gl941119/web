@@ -25,7 +25,7 @@ export default {
       photoNum: 1, // 图片数缓存
       infoList: [], // 渲染队列
       flag: true, // 是否需要渲染
-      isShowScroll: true, // 下滑图片过度
+      isShowScroll: false, // 下滑图片过度
       isShowName: false // logo过度
     }
   },
@@ -78,21 +78,37 @@ export default {
     handlePrestrain () {
       let images = new Array(this.photoTotal).fill()
       let count = 0 // 计数器
+      let promiseAll = []
       images.forEach((item, index) => {
         item = new Image()
-        item.src = this.calcUrl(index)
-        item.onerror = () => {
-          // 加载失败
-        }
-        item.onload = () => {
-          count++
-          // 加载成功
-          if (count === this.photoTotal) this.loadSuccess()
-        }
+        promiseAll[index] = new Promise((resolve, reject) => {
+          item = new Image()
+          item.src = this.calcUrl(index)
+          item.setAttribute('crossOrigin', 'Anonymous')
+          item.onload = function () {
+            resolve(item)
+          }
+          item.onerror = function () {
+            reject()
+          }
+        })
+        // item.onerror = () => {
+        //   // 加载失败
+        // }
+        // item.onload = () => {
+        //   count++
+        //   // 加载成功
+        //   if (count === this.photoTotal) this.loadSuccess()
+        // }
       })
+      Promise.all(promiseAll)
+        .then(imgs => {
+          this.loadSuccess()
+        })
     },
-    // 预加载完成绑定事件
+    // 预加载完成
     loadSuccess () {
+      this.isShowScroll = true // 显示下滑按钮
       window.addEventListener('scroll', throttle(() => {
         this.handleScroll()
       }, 20), true)
