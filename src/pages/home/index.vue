@@ -77,33 +77,27 @@ export default {
     // 预加载
     handlePrestrain () {
       let images = new Array(this.photoTotal).fill()
-      let count = 0 // 计数器
+      // let count = 0 // 计数器
       let promiseAll = []
       images.forEach((item, index) => {
         item = new Image()
         promiseAll[index] = new Promise((resolve, reject) => {
           item = new Image()
           item.src = this.calcUrl(index)
-          item.setAttribute('crossOrigin', 'Anonymous')
+          // item.setAttribute('crossOrigin', 'Anonymous')
           item.onload = function () {
             resolve(item)
           }
           item.onerror = function () {
-            reject()
+            reject(item)
           }
         })
-        // item.onerror = () => {
-        //   // 加载失败
-        // }
-        // item.onload = () => {
-        //   count++
-        //   // 加载成功
-        //   if (count === this.photoTotal) this.loadSuccess()
-        // }
       })
       Promise.all(promiseAll)
         .then(imgs => {
           this.loadSuccess()
+        }).catch(item => {
+
         })
     },
     // 预加载完成

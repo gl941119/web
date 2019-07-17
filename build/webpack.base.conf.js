@@ -52,7 +52,7 @@ module.exports = {
   module: {
     rules: [
       // Eslint
-      ...(config.dev.useEslint ? [createLintingRule()] : []),
+      // ...(config.dev.useEslint ? [createLintingRule()] : []),
       //less
       {
         test: /\.less$/,
